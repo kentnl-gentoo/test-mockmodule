@@ -1,10 +1,10 @@
-# $Id: MockModule.pm,v 1.2 2004/11/29 00:53:57 simonflack Exp $
+# $Id: MockModule.pm,v 1.3 2004/12/05 19:48:41 simonflack Exp $
 package Test::MockModule;
 use strict qw/subs vars/;
 use vars qw/$VERSION/;
 use Scalar::Util 'weaken';
 use Carp;
-$VERSION = '0.02';#sprintf'%d.%02d', q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = '0.03';#sprintf'%d.%02d', q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
 
 my %mocked;
 sub new {
@@ -54,8 +54,8 @@ sub mock {
         if (!$self->{_mocked}{$name}) {
             TRACE("Storing existing $sub_name");
             $self->{_mocked}{$name} = 1;
-            $self->{_orig}{$name}   = $self->{_package}->can($name)
-                                   || \&{$sub_name};
+            $self->{_orig}{$name}   = defined &{$sub_name} ? \&$sub_name
+                : $self->{_package}->can($name);
         }
         TRACE("Installing mocked $sub_name");
         _replace_sub($sub_name, $code);
@@ -117,7 +117,29 @@ sub _replace_sub {
     my ($sub_name, $coderef) = @_;
     # from Test::MockObject
     local $SIG{__WARN__} = sub { warn $_[0] unless $_[0] =~ /redefined/ };
-    *{$sub_name} = $coderef;
+    if (defined $coderef) {
+        *{$sub_name} = $coderef;
+    } else {
+        TRACE("removing subroutine: $sub_name");
+        my ($package, $sub) = $sub_name =~ /(.*::)(.*)/;
+        my %symbols = %{$package};
+
+        # save a copy of all non-code slots
+        my %slot;
+        foreach (qw(ARRAY FORMAT HASH IO SCALAR)) {
+            next unless defined(my $elem = *{$symbols{$sub}}{$_});
+            $slot{$_} = $elem;
+        }
+
+        # clear the symbol table entry for the subroutine
+        undef *$sub_name;
+
+        # restore everything except the code slot
+        return unless keys %slot;
+        foreach (keys %slot) {
+            *$sub_name = $slot{$_};
+        }
+    }
 }
 
 sub TRACE {0 && print STDERR "@_\n"}
@@ -205,6 +227,8 @@ go out of scope.
 =head1 SEE ALSO
 
 L<Test::MockObject::Extends>
+
+L<Sub::Override>
 
 =head1 AUTHOR
 

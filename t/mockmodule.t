@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use Test::More tests => 33;
+use Test::More tests => 36;
 
 require_ok('Test::MockModule');
 
@@ -24,6 +24,7 @@ like($@, qr/Invalid package name/, ' ... croaks if package looks invalid');
         Test::MockModule->new('CGI', no_auto => 1);
         ok(!$INC{'CGI.pm'}, '... no_auto prevents module being loaded');
     }
+
     my $mcgi = Test::MockModule->new('CGI');
     ok($INC{'CGI.pm'}, '... module loaded if !$VERSION');
     ok($mcgi->isa('Test::MockModule'), '... returns a Test::MockModule object');
@@ -36,6 +37,9 @@ like($@, qr/Invalid package name/, ' ... croaks if package looks invalid');
     is($mcgi->get_package, 'CGI', '... returns the package name');
 
     # mock()
+    # prime CGI routines
+    CGI->Vars; CGI->param;
+
     ok($mcgi->can('mock'), 'mock()');
     eval {$mcgi->mock(q[p-ram])};
 
@@ -110,3 +114,11 @@ $test_mock->unmock('method');
 ok(Test_Child->can('method'), 'unmocked subclass method still exists');
 is(Test_Child->method, 1, 'mocked subclass method');
 
+# test restoring non-existant functions
+$test_mock->mock(ISA => sub {'basic test'});
+can_ok(Test_Child => 'ISA');
+is(Test_Child::ISA(), 'basic test',
+   "testing a mocked sub that didn't exist before");
+$test_mock->unmock('ISA');
+ok(!Test_Child->can('ISA') && $Test_Child::ISA[0] eq 'Test_Parent',
+   "restoring an undefined sub doesn't clear out the rest of the symbols");
