@@ -1,21 +1,24 @@
-# $Id: MockModule.pm,v 1.3 2004/12/05 19:48:41 simonflack Exp $
+# $Id: MockModule.pm,v 1.6 2004/12/12 18:29:03 simonflack Exp $
 package Test::MockModule;
 use strict qw/subs vars/;
 use vars qw/$VERSION/;
-use Scalar::Util 'weaken';
+use Scalar::Util qw/reftype weaken/;
 use Carp;
-$VERSION = '0.03';#sprintf'%d.%02d', q$Revision: 1.3 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = '0.04';#sprintf'%d.%02d', q$Revision: 1.6 $ =~ /: (\d+)\.(\d+)/;
 
 my %mocked;
 sub new {
     my $class = shift;
     my ($package, %args) = @_;
-    if (my $existing = $mocked{$package}) {
+    if ($package && (my $existing = $mocked{$package})) {
         return $existing;
     }
 
-    croak "Cannot mock $package" if $class eq $package;
-    croak "Invalid package name $package" unless _valid_package($package);
+    croak "Cannot mock $package" if $package && $package eq $class;
+    unless (_valid_package($package)) {
+        $package = 'undef' unless defined $package;
+        croak "Invalid package name $package";
+    }
 
     unless ($args{no_auto} || ${"$package\::VERSION"}) {
         (my $load_package = "$package.pm") =~ s{::}{/}g;
@@ -46,8 +49,14 @@ sub get_package {
 sub mock {
     my $self = shift;
 
-    while (my ($name, $code) = splice @_, 0, 2) {
-        $code ||= sub {};
+    while (my ($name, $value) = splice @_, 0, 2) {
+        my $code = sub { };
+        if (ref $value && reftype $value eq 'CODE') {
+            $code = $value;
+        } elsif (defined $value) {
+            $code = sub {$value};
+        }
+
         TRACE("$name: $code");
         croak "Invalid subroutine name: $name" unless _valid_subname($name);
         my $sub_name = _full_name($self, $name);
@@ -143,7 +152,6 @@ sub _replace_sub {
 }
 
 sub TRACE {0 && print STDERR "@_\n"}
-sub DUMP  {}
 
 1;
 
@@ -174,7 +182,7 @@ for the purposes of unit testing.
 A C<Test::MockModule> object is set up to mock subroutines for a given
 module. The object remembers the original subroutine so it can be easily
 restored. This happens automatically when all MockModule objects for the given
-module go out of scope, or when you C<unmock()> the subroutine explicitly.
+module go out of scope, or when you C<unmock()> the subroutine.
 
 =head1 METHODS
 
@@ -199,10 +207,29 @@ Returns the target package name for the mocked subroutines
 Returns a boolean value indicating whether or not the subroutine is currently
 mocked
 
-=item mock($subroutine[, \&coderef])
+=item mock($subroutine =E<gt> \E<amp>coderef)
 
-Temporarily replaces C<$subroutine> with the supplied C<E<amp>coderef>. The
-code reference is optional, and defaults to an empty subroutine if omitted.
+Temporarily replaces one or more subroutines in the mocked module. A subroutine
+can be mocked with a code reference or a scalar. A scalar will be recast as a
+subroutine that returns the scalar.
+
+The following statements are equivalent:
+
+    $module->mock(purge => 'purged');
+    $module->mock(purge => sub { return 'purged'});
+
+    $module->mock(updated => [localtime()]);
+    $module->mock(updated => sub { return [localtime()]});
+
+However, C<undef> is a special case. If you mock a subroutine with C<undef> it
+will install an empty subroutine
+
+    $module->mock(purge => undef);
+    $module->mock(purge => sub { });
+
+rather than a subroutine that returns C<undef>:
+
+    $module->mock(purge => sub { undef });
 
 You can call C<mock()> for the same subroutine many times, but when you call
 C<unmock()>, the original subroutine is restored (not the last mocked

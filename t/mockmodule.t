@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use Test::More tests => 36;
+use Test::More tests => 41;
 
 require_ok('Test::MockModule');
 
@@ -18,6 +18,8 @@ eval {Test::MockModule->new('Test::MockModule')};
 like($@, qr/Cannot mock Test::MockModule/, '... cannot mock itself');
 eval {Test::MockModule->new('12Monkeys')};
 like($@, qr/Invalid package name/, ' ... croaks if package looks invalid');
+eval {Test::MockModule->new()};
+like($@, qr/Invalid package name/, ' ... croaks if package is undefined');
 
 {
     {
@@ -52,9 +54,31 @@ like($@, qr/Invalid package name/, ' ... croaks if package looks invalid');
     is_deeply(\@params, ['abc', 'def'],
         '... replaces the subroutine with a mocked sub');
 
-    $mcgi->mock('param');
+    $mcgi->mock('param' => undef);
     @params = CGI::param();
     is_deeply(\@params, [], '... which is an empty sub if !defined');
+
+    $mcgi->mock(param => 'The quick brown fox jumped over the lazy dog');
+    my $a2z = CGI::param();
+    is($a2z, 'The quick brown fox jumped over the lazy dog',
+       '... or a subroutine returning the supplied value');
+
+    my $ref = [1,2,3];
+    $mcgi->mock(param => $ref);
+    @params = CGI::param();
+    is($params[0], $ref,
+       '... given a reference, install a sub that returns said reference');
+
+    my $blessed_code = bless sub { return 'Hello World' }, 'FOO';
+    $mcgi->mock(param => $blessed_code);
+    @params = CGI::param();
+    is($params[0], 'Hello World', '... a blessed coderef is properly detected');
+
+    $mcgi->mock(Just => 'another', Perl => 'Hacker');
+    @params = (CGI::Just(), CGI::Perl());
+    is_deeply(\@params, ['another', 'Hacker'],
+              '... can mock multiple subroutines at a time');
+
 
     # original()
     ok($mcgi->can('original'), 'original()');
@@ -122,3 +146,4 @@ is(Test_Child::ISA(), 'basic test',
 $test_mock->unmock('ISA');
 ok(!Test_Child->can('ISA') && $Test_Child::ISA[0] eq 'Test_Parent',
    "restoring an undefined sub doesn't clear out the rest of the symbols");
+
