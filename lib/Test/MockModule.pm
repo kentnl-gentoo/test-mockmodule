@@ -1,10 +1,10 @@
-# $Id: MockModule.pm,v 1.1.1.1 2004/11/28 23:38:28 simonflack Exp $
+# $Id: MockModule.pm,v 1.2 2004/11/29 00:53:57 simonflack Exp $
 package Test::MockModule;
 use strict qw/subs vars/;
 use vars qw/$VERSION/;
 use Scalar::Util 'weaken';
 use Carp;
-$VERSION = '0.01';#sprintf'%d.%02d', q$Revision: 1.1.1.1 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = '0.02';#sprintf'%d.%02d', q$Revision: 1.2 $ =~ /: (\d+)\.(\d+)/;
 
 my %mocked;
 sub new {
@@ -54,7 +54,8 @@ sub mock {
         if (!$self->{_mocked}{$name}) {
             TRACE("Storing existing $sub_name");
             $self->{_mocked}{$name} = 1;
-            $self->{_orig}{$name}   = \&{$sub_name};
+            $self->{_orig}{$name}   = $self->{_package}->can($name)
+                                   || \&{$sub_name};
         }
         TRACE("Installing mocked $sub_name");
         _replace_sub($sub_name, $code);

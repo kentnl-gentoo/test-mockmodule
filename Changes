@@ -1,5 +1,8 @@
 Revision history for Test::MockModule
-$Id: Changes,v 1.1.1.1 2004/11/28 23:38:28 simonflack Exp $
+$Id: Changes,v 1.2 2004/11/29 00:53:57 simonflack Exp $
+
+v0.02  2004-11-28
+    - Fixed restoring inherited methods
 
 v0.01  2004-11-28
     - Initial revision

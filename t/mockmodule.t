@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use Test::More tests => 29;
+use Test::More tests => 33;
 
 require_ok('Test::MockModule');
 
@@ -94,3 +94,19 @@ like($@, qr/Invalid package name/, ' ... croaks if package looks invalid');
 
 isnt(CGI::param(), 'This sub is mocked',
      '... params is unmocked when object goes out of scope');
+
+# test inherited methods
+package Test_Parent;
+sub method { 1 }
+package Test_Child;
+@Test_Child::ISA = 'Test_Parent';
+package main;
+
+my $test_mock = Test::MockModule->new('Test_Child', no_auto => 1);
+ok(Test_Child->can('method'), 'test class inherits from parent');
+$test_mock->mock('method' => sub {2});
+is(Test_Child->method, 2, 'mocked subclass method');
+$test_mock->unmock('method');
+ok(Test_Child->can('method'), 'unmocked subclass method still exists');
+is(Test_Child->method, 1, 'mocked subclass method');
+
