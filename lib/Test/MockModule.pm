@@ -1,10 +1,10 @@
-# $Id: MockModule.pm,v 1.6 2004/12/12 18:29:03 simonflack Exp $
+# $Id: MockModule.pm,v 1.7 2005/03/24 22:23:38 simonflack Exp $
 package Test::MockModule;
 use strict qw/subs vars/;
 use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
-$VERSION = '0.04';#sprintf'%d.%02d', q$Revision: 1.6 $ =~ /: (\d+)\.(\d+)/;
+$VERSION = '0.05';#sprintf'%d.%02d', q$Revision: 1.7 $ =~ /: (\d+)\.(\d+)/;
 
 my %mocked;
 sub new {
@@ -81,19 +81,22 @@ sub original {
 
 sub unmock {
     my $self = shift;
-    my ($name) = @_;
-    croak "Invalid subroutine name: $name" unless _valid_subname($name);
 
-    my $sub_name = _full_name($self, $name);
-    unless ($self->{_mocked}{$name}) {
-        carp $sub_name . " was not mocked";
-        return;
+    for my $name (@_) {
+        croak "Invalid subroutine name: $name" unless _valid_subname($name);
+
+        my $sub_name = _full_name($self, $name);
+        unless ($self->{_mocked}{$name}) {
+            carp $sub_name . " was not mocked";
+            next;
+        }
+
+        TRACE("Restoring original $sub_name");
+        _replace_sub($sub_name, $self->{_orig}{$name});
+        delete $self->{_mocked}{$name};
+        delete $self->{_orig}{$name};
     }
-
-    TRACE("Restoring original $sub_name");
-    _replace_sub($sub_name, $self->{_orig}{$name});
-    delete $self->{_mocked}{$name};
-    delete $self->{_orig}{$name};
+    return $self;
 }
 
 sub unmock_all {
@@ -151,7 +154,9 @@ sub _replace_sub {
     }
 }
 
-sub TRACE {0 && print STDERR "@_\n"}
+# Log::Trace stubs
+sub TRACE {}
+sub DUMP  {}
 
 1;
 
@@ -239,9 +244,10 @@ instance).
 
 Returns the original (unmocked) subroutine
 
-=item unmock($subroutine)
+=item unmock($subroutine [, ...])
 
-Restores the original C<$subroutine>
+Restores the original C<$subroutine>. You can specify a list of subroutines to
+C<unmock()> in one go.
 
 =item unmock_all()
 
