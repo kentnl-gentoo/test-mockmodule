@@ -1,10 +1,10 @@
 {
    "abstract" : "Override subroutines in a module for unit testing",
    "author" : [
-      "Simon Flack"
+      "Geoff Franks <geoff.franks@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "open_source"
    ],
@@ -13,32 +13,43 @@
       "version" : "2"
    },
    "name" : "Test-MockModule",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0.45"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.38"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "SUPER" : "0",
-            "Scalar::Util" : "0",
-            "Test::More" : "0.45"
+            "Scalar::Util" : "0"
          }
       }
    },
+   "provides" : {
+      "Test::MockModule" : {
+         "file" : "lib/Test/MockModule.pm",
+         "version" : "0.06_2"
+      }
+   },
    "release_status" : "testing",
-   "version" : "0.06_1"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/geofffranks/test-mockmodule/issues"
+      },
+      "homepage" : "https://github.com/geofffranks/test-mockmodule",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "git://github.com/geofffranks/test-mockmodule.git"
+      }
+   },
+   "version" : "0.06_2"
 }

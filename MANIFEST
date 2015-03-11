@@ -1,11 +1,13 @@
+Build.PL
 Changes
-Makefile.PL
-MANIFEST
-MANIFEST.SKIP
-README
 lib/Test/MockModule.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/inheritance.t
+t/lib/ExampleModule.pm
 t/mockmodule.t
 t/pod.t
 t/pod_coverage.t
-META.yml                                 Module meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

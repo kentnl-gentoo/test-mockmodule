@@ -5,7 +5,7 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.06_1';
+$VERSION = '0.06_2';
 
 my %mocked;
 sub new {
@@ -280,7 +280,9 @@ L<Sub::Override>
 
 =head1 AUTHOR
 
-Simon Flack E<lt>simonflk _AT_ cpan.orgE<gt>
+Current Maintainer: Geoff Franks <gfranks@cpan.org>
+
+Original Author: Simon Flack E<lt>simonflk _AT_ cpan.orgE<gt>
 
 =head1 COPYRIGHT
 

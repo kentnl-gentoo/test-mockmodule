@@ -70,6 +70,6 @@
 #^MANIFEST\.SKIP
 
 # Avoid archives of this distribution
-^Test-MockModule-v\d+
+^Test-MockModule-*
 ^t/tmp
 
