@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
 	module_name         => 'Test::MockModule',
 	license             => 'gpl3',
-	dist_author         => q{Geoff Franks <geoff.franks@gmail.com>},
+	author_from         => 'lib/Test/MockModule.pm',
 	dist_version_from   => 'lib/Test/MockModule.pm',
 	meta_merge => {
 		resources => {
