@@ -1,7 +1,8 @@
 {
    "abstract" : "Override subroutines in a module for unit testing",
    "author" : [
-      "Current Maintainer: Geoff Franks <gfranks@cpan.org>"
+      "Current Maintainer: Geoff Franks <gfranks@cpan.org>",
+      "Original Author: Simon Flack <simonflk _AT_ cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
@@ -35,7 +36,7 @@
    "provides" : {
       "Test::MockModule" : {
          "file" : "lib/Test/MockModule.pm",
-         "version" : "0.06_3"
+         "version" : "0.06_4"
       }
    },
    "release_status" : "testing",
@@ -51,5 +52,5 @@
          "url" : "git://github.com/geofffranks/test-mockmodule.git"
       }
    },
-   "version" : "0.06_3"
+   "version" : "0.06_4"
 }

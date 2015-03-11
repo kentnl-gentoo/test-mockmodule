@@ -2,6 +2,7 @@
 abstract: 'Override subroutines in a module for unit testing'
 author:
   - 'Current Maintainer: Geoff Franks <gfranks@cpan.org>'
+  - 'Original Author: Simon Flack <simonflk _AT_ cpan.org>'
 build_requires:
   Test::More: 0.45
 configure_requires:
@@ -16,7 +17,7 @@ name: Test-MockModule
 provides:
   Test::MockModule:
     file: lib/Test/MockModule.pm
-    version: 0.06_3
+    version: 0.06_4
 requires:
   Carp: 0
   SUPER: 0
@@ -26,4 +27,4 @@ resources:
   homepage: https://github.com/geofffranks/test-mockmodule
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: git://github.com/geofffranks/test-mockmodule.git
-version: 0.06_3
+version: 0.06_4
