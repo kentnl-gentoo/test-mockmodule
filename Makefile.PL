@@ -2,9 +2,13 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Test::MockModule',
+    'LICENSE'	=> 'gpl',
     'VERSION_FROM'	=> 'lib/Test/MockModule.pm',
     'PREREQ_PM'		=> { 'Test::More'   => 0.45,
-                         'Scalar::Util' => 0, },
+                         'Scalar::Util' => 0,
+                         'Carp'         => 0,
+                         'SUPER'        => 0
+                       },
     ($] >= 5.005 ?
       (ABSTRACT_FROM => 'lib/Test/MockModule.pm',
        AUTHOR     => 'Simon Flack') : ()),

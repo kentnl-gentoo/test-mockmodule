@@ -4,7 +4,8 @@ use strict qw/subs vars/;
 use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
-$VERSION = '0.05';#sprintf'%d.%02d', q$Revision: 1.7 $ =~ /: (\d+)\.(\d+)/;
+use SUPER;
+$VERSION = '0.06_1';
 
 my %mocked;
 sub new {
@@ -63,8 +64,11 @@ sub mock {
         if (!$self->{_mocked}{$name}) {
             TRACE("Storing existing $sub_name");
             $self->{_mocked}{$name} = 1;
-            $self->{_orig}{$name}   = defined &{$sub_name} ? \&$sub_name
-                : $self->{_package}->can($name);
+            if (defined &{$sub_name}) {
+                $self->{_orig}{$name} = \&$sub_name;
+            } else {
+                $self->{_orig}{$name} = undef;
+            }
         }
         TRACE("Installing mocked $sub_name");
         _replace_sub($sub_name, $code);
@@ -76,9 +80,8 @@ sub original {
     my ($name) = @_;
     return carp _full_name($self, $name) . " is not mocked"
             unless $self->{_mocked}{$name};
-    return $self->{_orig}{$name};
+    return defined $self->{_orig}{$name} ? $self->{_orig}{$name} : $self->{_package}->super($name);
 }
-
 sub unmock {
     my $self = shift;
 
@@ -223,8 +226,20 @@ The following statements are equivalent:
     $module->mock(purge => 'purged');
     $module->mock(purge => sub { return 'purged'});
 
+When dealing with references, things behave slightly differently. The following
+statements are B<NOT> equivalent:
+
+    # Returns the same arrayref each time, with the localtime() at time of mocking
     $module->mock(updated => [localtime()]);
+    # Returns a new arrayref each time, with up-to-date localtime() value
     $module->mock(updated => sub { return [localtime()]});
+
+The following statements are in fact equivalent:
+
+    my $array_ref = [localtime()]
+    $module->mock(updated => $array_ref)
+    $module->mock(updated => sub { return $array_ref });
+
 
 However, C<undef> is a special case. If you mock a subroutine with C<undef> it
 will install an empty subroutine

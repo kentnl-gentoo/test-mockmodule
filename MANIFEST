@@ -8,3 +8,4 @@ t/mockmodule.t
 t/pod.t
 t/pod_coverage.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
