@@ -5,7 +5,7 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 my %mocked;
 sub new {
@@ -181,6 +181,17 @@ Test::MockModule - Override subroutines in a module for unit testing
    }
 
    Module::Name::subroutine(@args); # original subroutine
+
+   # Working with objects
+   use Foo;
+   use Test::MockModule;
+   {
+       my $mock = Test::MockModule('Foo');
+       $mock->mock(foo => sub { print "Foo!\n"; });
+
+       my $foo = Foo->new();
+       $foo->foo(); # prints "Foo!\n"
+   }
 
 =head1 DESCRIPTION
 
