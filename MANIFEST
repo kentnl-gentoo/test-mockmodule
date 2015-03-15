@@ -3,11 +3,12 @@ Changes
 lib/Test/MockModule.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
+META.yml
 README
 t/inheritance.t
 t/lib/ExampleModule.pm
 t/mockmodule.t
 t/pod.t
 t/pod_coverage.t
-META.yml
-META.json
+LICENSE
