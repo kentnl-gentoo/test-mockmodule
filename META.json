@@ -36,7 +36,7 @@
    "provides" : {
       "Test::MockModule" : {
          "file" : "lib/Test/MockModule.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -52,5 +52,5 @@
          "url" : "git://github.com/geofffranks/test-mockmodule.git"
       }
    },
-   "version" : "0.09"
+   "version" : "0.10"
 }
