@@ -1,5 +1,6 @@
-#!/usr/bin/perl -w
+use warnings;
 use strict;
+
 use Test::More;
 
 use lib "t/lib";

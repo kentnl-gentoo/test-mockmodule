@@ -1,11 +1,10 @@
-# $Id: MockModule.pm,v 1.7 2005/03/24 22:23:38 simonflack Exp $
 package Test::MockModule;
 use strict qw/subs vars/;
 use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 my %mocked;
 sub new {
@@ -175,7 +174,7 @@ Test::MockModule - Override subroutines in a module for unit testing
 	use Test::MockModule;
 
 	{
-		my $module = new Test::MockModule('Module::Name');
+		my $module = Test::MockModule->new('Module::Name');
 		$module->mock('subroutine', sub { ... });
 		Module::Name::subroutine(@args); # mocked
 	}
@@ -215,7 +214,7 @@ If there is no C<$VERSION> defined in C<$package>, the module will be
 automatically loaded. You can override this behaviour by setting the C<no_auto>
 option:
 
-	my $mock = new Test::MockModule('Module::Name', no_auto => 1);
+	my $mock = Test::MockModule->new('Module::Name', no_auto => 1);
 
 =item get_package()
 
