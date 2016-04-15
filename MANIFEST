@@ -10,5 +10,3 @@ README.md
 t/inheritance.t
 t/lib/ExampleModule.pm
 t/mockmodule.t
-t/pod.t
-t/pod_coverage.t
